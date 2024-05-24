@@ -20,7 +20,7 @@ void displayBoard(const vector<char> &board);
 char winner(const vector<char> &board);
 bool isLegal(const vector<char> &board, int move);
 int humanMove(const vector<char> &board, char human);
-int computerMove(const vector<char> &board, char computer);
+int computerMove(vector<char> board, char computer);
 void announceWinner(char winner, char computer, char human);
 
 
@@ -59,7 +59,7 @@ void instructions(){
     cout << " 3 | 4 | 5 \n";
     cout << "-------------";
     cout << " 6 | 7 | 8 \n\n";
-    cout << "Prepare yourself! The battle is about to begin! \n\n";
+    cout << "Prepare yourself! The battle is about to begin! ᕙ(⇀‸↼‶)ᕗ\n\n";
 }
 
 
@@ -86,20 +86,127 @@ int askNumber(string question, int high, int low){
 char humanPiece(){
     char go_first = askYesNo("Do you require the first move?");
     if (go_first == 'y'){
-        cout << "\nThen take the first move. You will need it!\n";
+        cout << "\nThen take the first move. This won't help you! (¬､¬)\n";
         return X;
     } else {
-        cout << "\nYour bravery will be your undoing...I will go first!\n";
+        cout << "\nIt's your first mistake! Don't underestimate me! (≖ ͜ʖ≖)\n";
         return O;
     }
 }
 
 
 char opponent(char piece){
-    switch (piece) {
-        case X:
-            return O;
-        case O:
+    if (piece == X) {
+        return O;
+    } else {
             return X;
+    }
+}
+
+
+void displayBoard(const vector<char> &board) {
+    cout << "\n\t" << board[0] << "|" << board[1] << "|" << board[2];
+    cout << "\n\t" << "---------";
+    cout << "\n\t" << board[3] << "|" << board[4] << "|" << board[5];
+    cout << "\n\t" << "---------";
+    cout << "\n\t" << board[6] << "|" << board[7] << "|" << board[8];
+    cout << "\n\t" << "---------";
+}
+
+
+char winner(const vector<char> &board) {
+    const int WINNING_ROWS[8][3] = {
+    {0, 1, 2},
+    {3, 4, 5},
+    {6, 7, 8},
+    {1, 4, 8},
+    {2, 4, 6},
+    {0, 3, 6},
+    {1, 4, 7},
+    {2, 5, 8},
+    };
+    const int TOTAL_ROWS = 8;
+    for (int row=0; row < TOTAL_ROWS; row++) {
+        if (board[WINNING_ROWS[row][0]] != EMPTY) && (board[WINNING_ROWS[row][0]] == board[WINNING_ROWS[row][1]]) && (board[WINNING_ROWS[row][1]] == board[WINNING_ROWS[row][2]]){
+            return board[WINNING_ROWS[row][0]];
+        }
+    }
+    if (count(board.begin(), board.end(), EMPTY) == 0) {
+        return TIE;
+    }
+    return NO_ONE;
+}
+
+
+inline bool isLegal(const vector<char> &board, int move) {
+    return (board[move] == EMPTY);
+}
+
+
+int humanMove(const vector<char> &board, char human) {
+    int move = askNumber("Where will you move?", (board.size() - 1));
+    while (!isLegal(move, board)) {
+        cout << "\nWhere you did you lost your brain, dumbass?!\nThat square is already occupied! (－_－)\n";
+        int move = askNumber("Where will you move?", (board.size() - 1));
+    }
+    cout << "I see...\n";
+    return move;
+}
+
+
+int computerMove(vector<char> board, char computer) {
+    unsigned int move = 0;
+    bool found = false;
+    while (!found && move < board.size()) {
+        if (isLegal(move, board)) {
+            board[move] = computer;
+            found = winner(board) == computer;
+            board[move] = EMPTY;
+        }
+        if (!found) {
+            move++;
+        }
+    }
+    if (!found) {
+        move = 0;
+        char human = opponent(computer);
+        while (!found && move < board.size()) {
+            if (isLegal(move, board)) {
+                board[move] = human;
+                found = winner(board) == human;
+                board[move] = EMPTY;
+            }
+            if (!found) {
+                move++;
+            }
+        }
+    }
+    if (!found) {
+        move = 0;
+        unsigned int i = 0;
+        const int BEST_MOVES[] = {4, 0, 2, 6, 8, 1, 3, 5, 7};
+        while (!found && i < board.size()) {
+            move = BEST_MOVES[i];
+            if (isLegal(move, board)) {
+                found = true;
+            }
+            i++;
+        }
+    }
+    cout << "I shall take square number " << move << endl;
+    return move;
+}
+
+
+void announceWinner(char winner, char computer, char human) {
+    if (winner == computer) {
+        cout << winner << "'s won!\n";
+        cout << "Ha-ha!!! Loser!!!\n";
+        cout << "Try better next time!!! ༼◥▶ل͜◀◤༽\n";
+    }
+    else if (winner == human) {
+        cout << winner << "'s won!\n";
+        cout << "This isn't real... Were you cheating?! ( ・⌓・｀)\n";
+        cout << "You got lucky this time... But next time I'll win!!! (ᗒᗣᗕ)՞\n";
     }
 }
